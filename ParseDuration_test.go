@@ -147,8 +147,8 @@ var parseDurationBytesTests = []struct {
 	{[]byte("-9223372036854775808ns"), false, 0},
 }
 
-//BenchmarkParseDuration Benchmark Parse Duration
-func BenchmarkParseDuration(b *testing.B) {
+//BenchmarkParseDurationStringInput Benchmark Parse Duration
+func BenchmarkParseDurationStringInput(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		for _, tc := range parseDurationTests {
 			d, err := time.ParseDuration(tc.in)
@@ -161,8 +161,22 @@ func BenchmarkParseDuration(b *testing.B) {
 	}
 }
 
-//BenchmarkParseDurationBytes Benchmark Parse Duration
-func BenchmarkParseDurationBytes(b *testing.B) {
+//BenchmarkParseDurationByteInput Benchmark Parse Duration
+func BenchmarkParseDurationByteInput(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		for _, tc := range parseDurationBytesTests {
+			d, err := time.ParseDuration(string(tc.in))
+			if tc.ok && (err != nil || d != tc.want) {
+				b.Errorf("ParseDuration(%q) = %v, %v, want %v, nil", tc.in, d, err, tc.want)
+			} else if !tc.ok && err == nil {
+				b.Errorf("ParseDuration(%q) = _, nil, want _, non-nil", tc.in)
+			}
+		}
+	}
+}
+
+//BenchmarkParseDurationByteInput Benchmark Parse Duration
+/*func BenchmarkParseDurationByteInput(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		for _, tc := range parseDurationBytesTests {
 			d, err := time.ParseDurationBytes(tc.in)
@@ -173,18 +187,4 @@ func BenchmarkParseDurationBytes(b *testing.B) {
 			}
 		}
 	}
-}
-
-//BenchmarkParseDurationBytesConversion Benchmark Parse Duration
-func BenchmarkParseDurationBytesConversion(b *testing.B) {
-	for n := 0; n < b.N; n++ {
-		for _, tc := range parseDurationTests {
-			d, err := time.ParseDurationBytes([]byte(tc.in))
-			if tc.ok && (err != nil || d != tc.want) {
-				b.Errorf("ParseDuration(%q) = %v, %v, want %v, nil", tc.in, d, err, tc.want)
-			} else if !tc.ok && err == nil {
-				b.Errorf("ParseDuration(%q) = _, nil, want _, non-nil", tc.in)
-			}
-		}
-	}
-}
+}*/
